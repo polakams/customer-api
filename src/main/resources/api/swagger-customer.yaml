@@ -1,0 +1,262 @@
+openapi: 3.0.3
+info:
+  title: Food Services - Customer Domain API
+  description: |-
+    This is a Food Services - Customer Domain API using OpenAPI 3.0.3 Version.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+servers:
+  - url: https://foodservice.swagger.io/api/v3
+paths:
+  /customers:
+    post:
+      tags:
+        - Customer
+      summary: Create a new customer
+      description: Create a new customer and customer details
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+            examples:
+              customerExample:
+                summary: Example customer
+                value:
+                  id: "123"
+                  name: "John Doe"
+                  localityId: "456"
+                  defaultGeoLocationId: "789"
+                  contact:
+                    phone: "123-456-7890"
+                    email: "john.doe@example.com"
+                    street: "123 Main St"
+                    city: "Anytown"
+                    state: "CA"
+                    zip: "12345"
+      responses:
+        201:
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        400:
+          $ref: '#/components/responses/BadRequest'
+    get:
+      tags:
+        - Customer
+      summary: Get all customers in a locality
+      description: Returns all customers in the given locality
+      operationId: getCustomersByLocality
+      parameters:
+        - $ref: '#/components/parameters/LocalityId'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+        400:
+          $ref: '#/components/responses/BadRequest'
+  /customers/{id}:
+    get:
+      tags:
+        - Customer
+      summary: Get customer details
+      description: Returns a single customer with all details
+      operationId: getCustomerById
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Customer
+      summary: Update an existing customer
+      description: Update an existing customer and customer details
+      operationId: updateCustomer
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        200:
+          description: Customer updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+        - Customer
+      summary: Partially update an existing customer
+      description: Partially update an existing customer and customer details
+      operationId: patchCustomer
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        200:
+          description: Customer updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Customer
+      summary: Delete a customer
+      description: Deletes a customer by ID
+      operationId: deleteCustomer
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      responses:
+        204:
+          description: Customer deleted successfully
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /customers/{id}/orders:
+    get:
+      tags:
+        - Customer
+      summary: Get all orders for a customer
+      description: Returns all orders for the specified customer
+      operationId: getCustomerOrders
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+components:
+  parameters:
+    CustomerId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The ID of the customer
+    LocalityId:
+      name: localityId
+      in: query
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The ID of the locality
+  responses:
+    BadRequest:
+      description: Invalid input
+    NotFound:
+      description: Resource not found
+  schemas:
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        localityId:
+          type: string
+          format: uuid
+        defaultGeoLocationId:
+          type: string
+          format: uuid
+        contact:
+          $ref: '#/components/schemas/Contact'
+    Contact:
+      type: object
+      properties:
+        phone:
+          type: string
+          format: phone
+        email:
+          type: string
+          format: email
+        street:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zip:
+          type: string
+          format: postal-code
+    Order:
+      type: object
+      properties:
+        orderId:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+        agentId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: float
+        items:
+          type: array
+          items:
+            type: string
+        updatedBy:
+          type: string
+        updatedTimestamp:
+          type: string
+          format: date-time
+        status:
+          type: string
+        localityId:
+          type: string
+          format: uuid
