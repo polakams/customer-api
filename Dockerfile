@@ -20,8 +20,10 @@ COPY src/main/resources/api /app/src/main/resources/api
 RUN ./gradlew build
 
 # Use an official OpenJDK runtime as a parent image
-FROM openjdk:17-jdk-slim
+FROM openjdk:17-slim
 
+# Set JAVA_HOME explicitly
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 RUN echo $JAVA_HOME
 
 # Set the working directory inside the container
