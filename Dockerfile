@@ -1,6 +1,10 @@
 # Use an official Gradle image to build the application
 FROM gradle:8.8.0-jdk17 AS build
 
+# Set JAVA_HOME explicitly for the build stage
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH=$JAVA_HOME/bin:$PATH
+
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -22,8 +26,11 @@ RUN ./gradlew build
 # Use an official OpenJDK runtime as a parent image
 FROM openjdk:17-slim
 
-# Set JAVA_HOME explicitly
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+# Set JAVA_HOME explicitly for the runtime stage
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+# Verify JAVA_HOME
 RUN echo $JAVA_HOME
 
 # Set the working directory inside the container
