@@ -6,12 +6,11 @@ import com.polakams.foodServices.api.model.Order;
 import com.polakams.foodservices.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.UUID;
 
-@RestController
+@Component
 public class CustomerController implements CustomerApi {
 
 	private final CustomerService customerService;
