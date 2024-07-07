@@ -6,14 +6,12 @@ import com.polakams.foodServices.api.model.Order;
 import com.polakams.foodservices.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1")
 public class CustomerController implements CustomerApi {
 
 	private final CustomerService customerService;
@@ -30,37 +28,37 @@ public class CustomerController implements CustomerApi {
 	}
 
 	@Override
-	public ResponseEntity<Customer> getCustomerById(UUID id) {
+	public ResponseEntity<Customer> getCustomerById(String id) {
 		Customer customer = customerService.getCustomerById(id.toString());
 		return ResponseEntity.ok(customer);
 	}
 
 	@Override
-	public ResponseEntity<Void> deleteCustomer(UUID id) {
+	public ResponseEntity<Void> deleteCustomer(String id) {
 		customerService.deleteCustomer(id.toString());
 		return ResponseEntity.noContent().build();
 	}
 
 	@Override
-	public ResponseEntity<Customer> updateCustomer(UUID id, Customer customer) {
+	public ResponseEntity<Customer> updateCustomer(String id, Customer customer) {
 		Customer updatedCustomer = customerService.updateCustomer(id.toString(), customer);
 		return ResponseEntity.ok(updatedCustomer);
 	}
 
 	@Override
-	public ResponseEntity<Customer> patchCustomer(UUID id, Customer customer) {
+	public ResponseEntity<Customer> patchCustomer(String id, Customer customer) {
 		Customer patchedCustomer = customerService.patchCustomer(id.toString(), customer);
 		return ResponseEntity.ok(patchedCustomer);
 	}
 
 	@Override
-	public ResponseEntity<List<Customer>> getCustomersByLocality(UUID localityId) {
+	public ResponseEntity<List<Customer>> getCustomersByLocality(String localityId) {
 		List<Customer> customers = customerService.getCustomersByLocality(localityId.toString());
 		return ResponseEntity.ok(customers);
 	}
 
 	@Override
-	public ResponseEntity<List<Order>> getCustomerOrders(UUID id) {
+	public ResponseEntity<List<Order>> getCustomerOrders(String id) {
 		List<Order> orders = customerService.getCustomerOrders(id.toString());
 		return ResponseEntity.ok(orders);
 	}

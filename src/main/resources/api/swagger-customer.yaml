@@ -181,7 +181,6 @@ components:
       required: true
       schema:
         type: string
-        format: uuid
       description: The ID of the customer
     LocalityId:
       name: localityId
@@ -189,7 +188,6 @@ components:
       required: true
       schema:
         type: string
-        format: uuid
       description: The ID of the locality
   responses:
     BadRequest:
@@ -202,15 +200,12 @@ components:
       properties:
         id:
           type: string
-          format: uuid
         name:
           type: string
         localityId:
           type: string
-          format: uuid
         defaultGeoLocationId:
           type: string
-          format: uuid
         contact:
           $ref: '#/components/schemas/Contact'
     Contact:
@@ -236,16 +231,12 @@ components:
       properties:
         orderId:
           type: string
-          format: uuid
         customerId:
           type: string
-          format: uuid
         agentId:
           type: string
-          format: uuid
         amount:
           type: number
-          format: float
         items:
           type: array
           items:
@@ -254,9 +245,7 @@ components:
           type: string
         updatedTimestamp:
           type: string
-          format: date-time
         status:
           type: string
         localityId:
           type: string
-          format: uuid
