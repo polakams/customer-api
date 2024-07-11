@@ -1,6 +1,7 @@
 package com.polakams.foodservices.controller;
 
 import com.polakams.foodServices.api.CustomerApi;
+import com.polakams.foodServices.api.CustomerApiDelegate;
 import com.polakams.foodServices.api.model.Customer;
 import com.polakams.foodServices.api.model.Order;
 import com.polakams.foodservices.service.CustomerService;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class CustomerController implements CustomerApi {
+public class CustomerController implements CustomerApiDelegate {
 
 	private final CustomerService customerService;
 

@@ -19,7 +19,10 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public Customer getCustomerById(String id) {
 		// TODO: Implement business logic for retrieving a customer by ID
-		return new Customer();
+		Customer cus = new Customer();
+		cus.id(id);
+		cus.name("test");
+		return cus;
 	}
 
 	@Override
