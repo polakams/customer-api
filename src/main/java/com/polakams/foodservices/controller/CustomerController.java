@@ -1,11 +1,11 @@
 package com.polakams.foodservices.controller;
 
-import com.polakams.foodServices.api.CustomerApi;
 import com.polakams.foodServices.api.CustomerApiDelegate;
 import com.polakams.foodServices.api.model.Customer;
 import com.polakams.foodServices.api.model.Order;
 import com.polakams.foodservices.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -14,17 +14,13 @@ import java.util.List;
 @Component
 public class CustomerController implements CustomerApiDelegate {
 
-	private final CustomerService customerService;
-
 	@Autowired
-	public CustomerController(CustomerService customerService) {
-		this.customerService = customerService;
-	}
+	private CustomerService customerService;
 
 	@Override
 	public ResponseEntity<Customer> createCustomer(Customer customer) {
 		Customer createdCustomer = customerService.createCustomer(customer);
-		return ResponseEntity.status(201).body(createdCustomer);
+		return new ResponseEntity<>(createdCustomer, HttpStatus.OK);
 	}
 
 	@Override

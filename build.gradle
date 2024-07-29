@@ -1,16 +1,36 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.0'
+    id 'org.springframework.boot' version '3.3.1'
     id 'io.spring.dependency-management' version '1.1.5'
     id 'org.hidetake.swagger.generator' version '2.19.2'
+    id 'jacoco'
+    id 'checkstyle'
+    id 'com.diffplug.spotless' version '5.14.3'
 }
 
 group = 'com.polakams'
 version = '0.0.1-SNAPSHOT'
+ext {
+    springBootVersion = '3.3.0'
+    lombokVersion = '1.18.30'
+    swaggerVersion = '2.2.20'
+    jacocoVersion = '0.8.11'
+    checkstyleVersion = '8.29'
+}
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+jar {
+    archiveBaseName = 'customer-api'
+    version = '0.0.1-SNAPSHOT'
+    destinationDirectory.set(layout.buildDirectory.dir("libs"))
+}
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
     }
 }
 
@@ -18,39 +38,97 @@ repositories {
     mavenCentral()
 }
 
-bootJar {
-    enabled = true
-}
-
-jar {
-    enabled = false
-}
-
 dependencies {
-    // Spring Boot Starters
-    implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.projectlombok:lombok:1.18.30'
+    // Spring Boot
+    implementation "org.springframework.boot:spring-boot-starter-cache:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
 
-    // Testing
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Lombok
+    implementation "org.projectlombok:lombok:${lombokVersion}"
 
-    // Swagger Codegen
-    swaggerCodegen 'org.openapitools:openapi-generator-cli:7.3.0'
-    implementation 'io.swagger.core.v3:swagger-annotations:2.2.20'
-
-    // Swagger Docs UI
+    // Swagger
+    implementation "io.swagger.core.v3:swagger-annotations:${swaggerVersion}"
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 
     // Database
-    implementation 'com.h2database:h2'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    implementation 'org.springframework.data:spring-data-commons'
+    implementation 'javax.xml.bind:jaxb-api:2.3.0'
+
+    // Testing
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.mockito:mockito-core:4.0.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.0.0'
+
+    // Swagger Codegen
+    swaggerCodegen 'org.openapitools:openapi-generator-cli:7.3.0'
+}
+tasks.withType(Test) {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: ['**/org/polakams/ordersapi/api/**',
+                                        '**/generated-sources/swagger/**'])
+        }))
+    }
+}
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.80
+            }
+        }
+    }
+}
+jacoco {
+    toolVersion = "${jacocoVersion}"
+    reportsDirectory = layout.buildDirectory.dir('jacocoReports')
+}
+checkstyle {
+    toolVersion = "${checkstyleVersion}"
+    configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
+    configProperties.checkstyleSuppressionsPath = file("${project.rootDir}/config/checkstyle/suppressions.xml").absolutePath
 }
 
+checkstyleMain {
+    enabled = false
+}
+checkstyleTest {
+    enabled = false
+}
+
+project.afterEvaluate {
+    spotless {
+        java {
+            //googleJavaFormat() //TODO: Fix errors with using googleJavaFormat()
+            targetExclude 'build/generated-sources/**'
+        }
+    }
+}
+
+tasks.named('checkstyleMain').configure {
+    source = sourceSets.main.allJava.matching {
+        exclude '**/generated-sources/**'
+    }
+    dependsOn 'generateSwaggerCode'
+}
 processResources {
     dependsOn(generateSwaggerCode)
 }
@@ -72,16 +150,3 @@ compileJava.dependsOn swaggerSources.customerService.code
 sourceSets.main.java.srcDir "${swaggerSources.customerService.code.outputDir}/src/main/java"
 sourceSets.main.resources.srcDir "${swaggerSources.customerService.code.outputDir}/src/main/resources"
 
-tasks.register('listGeneratedFiles') {
-    description = 'Lists all files generated by Swagger Codegen'
-    dependsOn generateSwaggerCode
-    doLast {
-        def outputDir = swaggerSources.customerService.code.outputDir
-        println "Generated files in $outputDir:"
-        fileTree(outputDir).each { file ->
-            println file
-        }
-    }
-}
-
-build.finalizedBy listGeneratedFiles
