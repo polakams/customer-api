@@ -2,7 +2,10 @@ package com.polakams.foodservices.service;
 
 import com.polakams.foodServices.api.model.Customer;
 import com.polakams.foodServices.api.model.Order;
-import com.polakams.foodservices.service.CustomerService;
+import com.polakams.foodservices.exception.CustomerAlreadyExistsException;
+import com.polakams.foodservices.exception.NoSuchCustomerException;
+import com.polakams.foodservices.repository.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,19 +13,26 @@ import java.util.List;
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
+	@Autowired
+	private CustomerRepository customerRepository;
+
 	@Override
 	public Customer createCustomer(Customer customer) {
-		// TODO: Implement business logic for creating a customer
-		return customer;
+		if (customerRepository.findById(customer.getId()).isPresent()) {
+			throw new CustomerAlreadyExistsException(customer.getId() + " already exists!");
+		} else {
+			return customerRepository.save(customer);
+		}
 	}
 
 	@Override
 	public Customer getCustomerById(String id) {
-		// TODO: Implement business logic for retrieving a customer by ID
-		Customer cus = new Customer();
-		cus.id(id);
-		cus.name("test");
-		return cus;
+		Customer customerByCustomerId = customerRepository.findById(id).get();
+		if (customerByCustomerId != null) {
+			return customerByCustomerId;
+		} else {
+			throw new NoSuchCustomerException("Item not found with this customerId " + customerByCustomerId);
+		}
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 {
   "library": "spring-boot",
-  "dateLibrary": "java17",
+  "dateLibrary": "java21",
   "hideGenerationTimestamp": true,
   "modelPackage": "com.polakams.foodServices.api.model",
   "apiPackage": "com.polakams.foodServices.api",
@@ -9,7 +9,7 @@
   "openApiNullable": false,
   "useTags": true,
   "useGzipFeature": true,
-  "hateoas": true,
+  "hateoas": false,
   "unhandledException": true,
   "useSpringBoot3": true,
   "useSwaggerUI": true,

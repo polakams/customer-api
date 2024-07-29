@@ -196,6 +196,7 @@ components:
       description: Resource not found
   schemas:
     Customer:
+      x-class-extra-annotation: "@org.springframework.data.mongodb.core.mapping.Document(collection = \"customer\")"
       type: object
       properties:
         id:
